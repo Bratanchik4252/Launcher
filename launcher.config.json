@@ -1,0 +1,35 @@
+{
+  "brandName": "NOVACRAFT",
+  "supabaseUrl": "https://YOUR-PROJECT.supabase.co",
+  "supabaseAnonKey": "YOUR-ANON-KEY",
+  "gameVersion": "1.7.10",
+  "forgeVersion": "10.13.4.1614-1.7.10",
+  "links": {
+    "website": "index.html",
+    "register": "auth.html",
+    "forgotPassword": "#",
+    "discord": "https://discord.gg/mMhmkgExNM",
+    "telegram": "https://t.me/NOVACRAFT2",
+    "supportDiscord": "https://discord.gg/mMhmkgExNM"
+  },
+  "modpack": {
+    "source": "github",
+    "githubOwner": "Bratanchik4252",
+    "githubRepo": "ModPack",
+    "githubAssetName": "modpack.zip",
+    "sha256": "",
+    "manifestUrl": "",
+    "fallbackDownloadUrl": ""
+  },
+  "java": {
+    "majorVersion": 8,
+    "temurinJreUrl": "https://api.adoptium.net/v3/binary/latest/8/ga/windows/x64/jre/hotspot/normal/eclipse"
+  },
+  "updater": {
+    "githubOwner": "Bratanchik4252",
+    "githubRepo": "NovaCraft",
+    "mandatory": true
+  },
+  "defaultRamMb": 4096,
+  "maxSavedAccounts": 3
+}

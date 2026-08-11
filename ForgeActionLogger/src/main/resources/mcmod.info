@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "actionlogger",
+    "name": "Action Logger",
+    "description": "Logs full player actions: GUI open, inventory clicks, item pickup/drop, container open/close and chat. Log file: config/ActionLogger/player_actions.log",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["FiveLauncher"],
+    "credits": "FiveLauncher",
+    "logoFile": "",
+    "dependencies": []
+  }
+]

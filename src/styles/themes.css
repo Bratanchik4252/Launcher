@@ -1,0 +1,77 @@
+[data-theme="dark"] {
+  --bg-gradient: radial-gradient(120% 100% at 70% 0%, #0a0a0a 0%, #000000 45%, #000000 100%);
+  --text: #f5f5f5;
+  --text-muted: #8a8a90;
+  --border: rgba(255, 255, 255, 0.1);
+  --glass: rgba(12, 12, 14, 0.72);
+  --glass-inset: rgba(0, 0, 0, 0.5);
+  --hover: rgba(255, 255, 255, 0.08);
+  --accent: #e8e8ec;
+  --accent-2: #6a6a72;
+  --accent-soft: rgba(232, 232, 236, 0.22);
+  --accent-glow: rgba(232, 232, 236, 0.18);
+  --btn-bg-top: rgba(32, 32, 36, 0.9);
+  --btn-bg-bottom: rgba(0, 0, 0, 0.95);
+}
+
+[data-theme="light"] {
+  --bg-gradient: radial-gradient(120% 100% at 70% 0%, #ffffff 0%, #f6f6f8 50%, #ececf0 100%);
+  --text: #17171b;
+  --text-muted: #5c5c66;
+  --border: rgba(20, 20, 28, 0.12);
+  --glass: rgba(255, 255, 255, 0.8);
+  --glass-inset: rgba(255, 255, 255, 0.55);
+  --hover: rgba(20, 20, 28, 0.06);
+  --accent: #18181c;
+  --accent-2: #5c5c66;
+  --accent-soft: rgba(24, 24, 28, 0.15);
+  --accent-glow: rgba(24, 24, 28, 0.2);
+  --btn-bg-top: #ffffff;
+  --btn-bg-bottom: #e8e8ec;
+}
+
+[data-accent="mono"] {
+  --accent: #e8e8ec;
+  --accent-2: #6a6a72;
+  --accent-soft: rgba(232, 232, 236, 0.22);
+  --accent-glow: rgba(232, 232, 236, 0.18);
+}
+
+[data-theme="light"][data-accent="mono"] {
+  --accent: #18181c;
+  --accent-2: #5c5c66;
+  --accent-soft: rgba(24, 24, 28, 0.15);
+  --accent-glow: rgba(24, 24, 28, 0.2);
+}
+
+[data-accent="royal"] {
+  --accent: #4f7cff;
+  --accent-2: #2a4fd9;
+  --accent-soft: rgba(79, 124, 255, 0.35);
+  --accent-glow: rgba(79, 124, 255, 0.4);
+}
+
+[data-accent="amber"] {
+  --accent: #ffb020;
+  --accent-2: #ff8c00;
+  --accent-soft: rgba(255, 176, 32, 0.35);
+  --accent-glow: rgba(255, 176, 32, 0.4);
+}
+
+[data-accent="mint"] {
+  --accent: #2ecc9a;
+  --accent-2: #1aab7a;
+  --accent-soft: rgba(46, 204, 154, 0.35);
+  --accent-glow: rgba(46, 204, 154, 0.4);
+}
+
+[data-accent="rose"] {
+  --accent: #ff5c8a;
+  --accent-2: #e03d6b;
+  --accent-soft: rgba(255, 92, 138, 0.35);
+  --accent-glow: rgba(255, 92, 138, 0.4);
+}
+
+[data-theme="light"][data-accent="royal"] {
+  --accent: #3d6aff;
+}
