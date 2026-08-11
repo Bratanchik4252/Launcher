@@ -5,10 +5,10 @@
   "gameVersion": "1.7.10",
   "forgeVersion": "10.13.4.1614-1.7.10",
   "links": {
-    "website": "https://novacraft/",
-    "register": "https://novacraft/auth.html",
-    "forgotPassword": "https://novacraft/auth.html",
-    "serversPage": "https://novacraft/servers.html",
+    "website": "https://novacraft-virid.vercel.app/",
+    "register": "https://novacraft-virid.vercel.app/auth.html",
+    "forgotPassword": "https://novacraft-virid.vercel.app/auth.html",
+    "serversPage": "https://novacraft-virid.vercel.app/servers.html",
     "discord": "https://discord.gg/mMhmkgExNM",
     "telegram": "https://t.me/NOVACRAFT2",
     "supportDiscord": "https://discord.gg/mMhmkgExNM"
