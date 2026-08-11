@@ -1214,3 +1214,196 @@ input {
 .install-error { margin: 0; color: #ff6b6b; font-size: 0.85rem; }
 
 .install-btn { max-width: 220px; }
+
+
+/* ==========================================================================
+   NOVACRAFT: анимационный слой (рестайл под сайт: тёмный glass + зелёный)
+   ========================================================================== */
+
+/* ---------- Фон: медленная «аврора» + сетка ---------- */
+.app-shell::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 38% at 22% 28%, var(--accent-soft), transparent 70%),
+    radial-gradient(36% 34% at 78% 66%, var(--accent-glow), transparent 72%),
+    radial-gradient(30% 28% at 60% 12%, rgba(77, 255, 136, 0.08), transparent 75%);
+  animation: aurora 18s ease-in-out infinite alternate;
+  filter: blur(10px);
+}
+
+@keyframes aurora {
+  0%   { transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(2%, 2%, 0) rotate(4deg) scale(1.06); }
+  100% { transform: translate3d(-1%, 1%, 0) rotate(-3deg) scale(1.02); }
+}
+
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(120% 90% at 50% 10%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 10%, #000 40%, transparent 100%);
+}
+
+/* ---------- Бренд: градиентный логотип с бликом ---------- */
+.brand {
+  background: linear-gradient(92deg, var(--text) 0%, var(--accent) 55%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  font-size: 1.25rem;
+}
+
+.brand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brand-shine 5s linear infinite;
+}
+
+@keyframes brand-shine {
+  0% { background-position: 200% 0; }
+  60%, 100% { background-position: -200% 0; }
+}
+
+/* ---------- Кнопка Играть: пульсирующее свечение ---------- */
+.primary-btn.play-btn {
+  position: relative;
+  overflow: hidden;
+  animation: play-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes play-pulse {
+  0%, 100% { box-shadow: 0 0 18px var(--accent-glow); }
+  50%      { box-shadow: 0 0 46px var(--accent-glow), 0 0 90px var(--accent-soft); }
+}
+
+.primary-btn.play-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  animation: btn-sweep 3.2s ease-in-out infinite;
+}
+
+@keyframes btn-sweep {
+  0% { left: -60%; }
+  55%, 100% { left: 130%; }
+}
+
+/* ---------- Стекло: градиентная рамка при наведении ---------- */
+.glass {
+  position: relative;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, var(--accent-glow), transparent 40%, transparent 65%, var(--accent-soft));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.25;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.glass:hover::before {
+  opacity: 0.8;
+}
+
+/* ---------- Прогресс-бар: градиент с бегущими бликами ---------- */
+.progress-bar > span {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar > span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%);
+  animation: bar-glint 1.4s linear infinite;
+}
+
+@keyframes bar-glint {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+
+/* ---------- Бейджи/теги: мягкое дыхание ---------- */
+.news-tag {
+  animation: tag-breathe 3s ease-in-out infinite;
+}
+
+@keyframes tag-breathe {
+  0%, 100% { box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+  50% { box-shadow: 0 0 14px rgba(46, 204, 113, 0.55); }
+}
+
+/* ---------- Карточки серверов: подъём + свечение ---------- */
+.server-card {
+  animation: card-in 0.5s ease both;
+}
+
+.server-card:nth-child(2) { animation-delay: 0.06s; }
+.server-card:nth-child(3) { animation-delay: 0.12s; }
+.server-card:nth-child(4) { animation-delay: 0.18s; }
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Скроллбар ---------- */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--glass-inset);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--accent-soft); }
+
+/* ---------- Аватар/шапка: лёгкое вращение градиента ---------- */
+.avatar {
+  background-size: 200% 200%;
+  animation: avatar-shift 6s ease-in-out infinite;
+}
+
+@keyframes avatar-shift {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+}
+
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

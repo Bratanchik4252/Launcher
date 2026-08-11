@@ -82,7 +82,7 @@ export type LaunchProgress = {
   bytesTotal?: number;
 };
 
-export type AccentId = "mono" | "royal" | "amber" | "mint" | "rose";
+export type AccentId = "nova" | "mono" | "royal" | "amber" | "mint" | "rose";
 
 export type LangId = "ru" | "en" | "de" | "fr" | "es" | "uk" | "pl";
 

@@ -137,6 +137,9 @@ export const messages = {
     installRegister: "Регистрация в системе",
     installLaunching: "Установлено! Запуск...",
     installError: "Ошибка установки",
+    uninstallTitle: "Удаление лаунчера",
+    uninstallBtn: "Удалить NOVACRAFT Launcher",
+    uninstallConfirm: "Удалить лаунчер с компьютера? Игра, Java и моды останутся в папке данных.",
     banTitle: "Ваш компьютер заблокирован",
     banText:
       "Ваше оборудование находится в списке заблокированных. Если вы считаете это ошибкой — напишите в поддержку.",
@@ -218,6 +221,9 @@ export const messages = {
     installRegister: "Registering in the system",
     installLaunching: "Installed! Launching...",
     installError: "Installation error",
+    uninstallTitle: "Uninstall launcher",
+    uninstallBtn: "Remove NOVACRAFT Launcher",
+    uninstallConfirm: "Remove the launcher from this PC? Game, Java and mods will stay in the data folder.",
     banTitle: "Your computer is banned",
     banText:
       "Your hardware is on the banned list. If you think this is a mistake — contact support.",
@@ -299,6 +305,9 @@ export const messages = {
     installRegister: "Registrierung im System",
     installLaunching: "Installiert! Starte...",
     installError: "Installationsfehler",
+    uninstallTitle: "Launcher deinstallieren",
+    uninstallBtn: "NOVACRAFT Launcher entfernen",
+    uninstallConfirm: "Launcher von diesem PC entfernen? Spiel, Java und Mods bleiben im Datenordner.",
     banTitle: "Dein Computer ist gesperrt",
     banText:
       "Deine Hardware steht auf der Sperrliste. Wenn du glaubst, dass das ein Fehler ist — kontaktiere den Support.",
@@ -380,6 +389,9 @@ export const messages = {
     installRegister: "Enregistrement dans le système",
     installLaunching: "Installé ! Lancement...",
     installError: "Erreur d'installation",
+    uninstallTitle: "Désinstaller le launcher",
+    uninstallBtn: "Supprimer NOVACRAFT Launcher",
+    uninstallConfirm: "Supprimer le launcher de ce PC ? Le jeu, Java et les mods resteront dans le dossier de données.",
     banTitle: "Votre ordinateur est banni",
     banText:
       "Votre matériel figure sur la liste des bannis. Si vous pensez qu'il s'agit d'une erreur — contactez le support.",
@@ -461,6 +473,9 @@ export const messages = {
     installRegister: "Registrando en el sistema",
     installLaunching: "¡Instalado! Iniciando...",
     installError: "Error de instalación",
+    uninstallTitle: "Desinstalar el launcher",
+    uninstallBtn: "Eliminar NOVACRAFT Launcher",
+    uninstallConfirm: "¿Eliminar el launcher de este PC? El juego, Java y los mods permanecerán en la carpeta de datos.",
     banTitle: "Tu ordenador está baneado",
     banText:
       "Tu hardware está en la lista de baneados. Si crees que es un error — contacta con el soporte.",
@@ -542,6 +557,9 @@ export const messages = {
     installRegister: "Реєстрація в системі",
     installLaunching: "Встановлено! Запуск...",
     installError: "Помилка встановлення",
+    uninstallTitle: "Видалення лаунчера",
+    uninstallBtn: "Видалити NOVACRAFT Launcher",
+    uninstallConfirm: "Видалити лаунчер з комп'ютера? Гра, Java та моди залишаться в папці даних.",
     banTitle: "Ваш комп'ютер заблоковано",
     banText:
       "Ваше обладнання перебуває у списку заблокованих. Якщо ви вважаєте це помилкою — напишіть у підтримку.",
@@ -623,6 +641,9 @@ export const messages = {
     installRegister: "Rejestracja w systemie",
     installLaunching: "Zainstalowano! Uruchamianie...",
     installError: "Błąd instalacji",
+    uninstallTitle: "Odinstaluj launcher",
+    uninstallBtn: "Usuń NOVACRAFT Launcher",
+    uninstallConfirm: "Usunąć launcher z tego komputera? Gra, Java i mody pozostaną w folderze danych.",
     banTitle: "Twój komputer jest zablokowany",
     banText:
       "Twój sprzęt znajduje się na liście zablokowanych. Jeśli uważasz, że to błąd — napisz do pomocy.",
@@ -643,6 +664,7 @@ export function m(lang: Lang, key: MessageKey): string {
 }
 
 export const ACCENT_OPTIONS = [
+  { id: "nova" as const, ru: "NOVA-зелёный", en: "NOVA green", color: "#4dff88" },
   { id: "mono" as const, ru: "Монохромный", en: "Mono", color: "#e8e8ec" },
   { id: "royal" as const, ru: "Королевский синий", en: "Royal blue", color: "#4f7cff" },
   { id: "amber" as const, ru: "Янтарный", en: "Amber", color: "#ffb020" },

@@ -190,6 +190,19 @@ export function SettingsPage({ lang, settings, onChange, isDev, gameDir }: Props
                 </div>
                 <p className="muted">{m(lang, "otherHint")}</p>
               </div>
+              <div className="settings-card glass" style={{ borderColor: "rgba(255, 80, 80, 0.35)" }}>
+                <h3 style={{ color: "#ff6b6b", margin: "0 0 8px" }}>{m(lang, "uninstallTitle")}</h3>
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  style={{ borderColor: "rgba(255, 80, 80, 0.5)", color: "#ff6b6b" }}
+                  onClick={() => {
+                    if (confirm(m(lang, "uninstallConfirm"))) void window.launcher.uninstallApp();
+                  }}
+                >
+                  {m(lang, "uninstallBtn")}
+                </button>
+              </div>
             </motion.div>
           )}
         </div>

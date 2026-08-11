@@ -10,27 +10,40 @@ type Props = {
   onSupport: () => void;
 };
 
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const } },
+};
+
 export function HomePage({ lang, loggedIn, onlineLabel, onPlay, onReadUpdate, onSupport }: Props) {
   return (
     <motion.div
       className="page page-home"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      variants={container}
+      initial="hidden"
+      animate="show"
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.3 }}
     >
       <div className="home-grid">
         <div className="hero">
-          <motion.h2 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.h2 variants={item}>
             {m(lang, "heroTitle")} <span>{m(lang, "heroAccent")}</span>
           </motion.h2>
-          <p>{m(lang, "heroText")}</p>
-          <div className="stats">
+          <motion.p variants={item}>{m(lang, "heroText")}</motion.p>
+          <motion.div variants={item} className="stats">
             <div className="stat glass">
               <strong>{onlineLabel}</strong>
               {m(lang, "online")}
             </div>
-          </div>
+          </motion.div>
           <motion.button
+            variants={item}
             type="button"
             className="outline-btn read-update-btn"
             onClick={onReadUpdate}
@@ -41,9 +54,9 @@ export function HomePage({ lang, loggedIn, onlineLabel, onPlay, onReadUpdate, on
         </div>
         <motion.article
           className="news-hero glass"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15 }}
+          initial={{ opacity: 0, x: 24, scale: 0.98 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="news-hero-visual" />
           <div className="news-hero-body">
@@ -53,7 +66,12 @@ export function HomePage({ lang, loggedIn, onlineLabel, onPlay, onReadUpdate, on
           </div>
         </motion.article>
       </div>
-      <footer className="play-dock glass">
+      <motion.footer
+        className="play-dock glass"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      >
         <button type="button" className="ghost-btn" onClick={onSupport}>
           {m(lang, "support")}
         </button>
@@ -61,15 +79,13 @@ export function HomePage({ lang, loggedIn, onlineLabel, onPlay, onReadUpdate, on
           type="button"
           className="primary-btn play-btn"
           onClick={onPlay}
-          whileHover={{ scale: 1.03, boxShadow: "0 0 48px var(--accent-glow)" }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
         >
           {m(lang, "play").toUpperCase()}
         </motion.button>
-        {!loggedIn && (
-          <span className="play-hint">{m(lang, "signInToLaunch")}</span>
-        )}
-      </footer>
+        {!loggedIn && <span className="play-hint">{m(lang, "signInToLaunch")}</span>}
+      </motion.footer>
     </motion.div>
   );
 }

@@ -20,7 +20,7 @@ const defaultSettings: AppSettings = {
   ramAuto: true,
   language: "ru",
   theme: "dark",
-  accent: "mono",
+  accent: "nova",
   rememberMe: true,
   gameDir: "",
   showDevLogs: false,
