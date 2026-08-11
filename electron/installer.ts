@@ -96,24 +96,31 @@ New-Link (Join-Path $sm 'Сайт NOVACRAFT.lnk') '${q(website)}'
 /** Регистрация в «Установка и удаление программ» (HKCU, без прав админа). */
 function registerUninstall(exe: string, onProgress: (p: LaunchProgress) => void): Promise<void> {
   const key = `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\NOVACRAFTLauncher`;
-  const base = [
-    "reg.exe", "add", key, "/f",
-    "/v", "DisplayName", "/d", "NOVACRAFT Launcher",
-    "/v", "DisplayVersion", "/d", app.getVersion(),
-    "/v", "Publisher", "/d", "NOVACRAFT",
-    "/v", "DisplayIcon", "/d", exe,
-    "/v", "InstallLocation", "/d", path.dirname(exe),
-    "/v", "UninstallString", "/d", `"${exe}" --uninstall`,
-    "/v", "NoModify", "/t", "REG_DWORD", "/d", "1",
-    "/v", "NoRepair", "/t", "REG_DWORD", "/d", "1",
+  const values: Array<[string, string, string?]> = [
+    ["DisplayName", "NOVACRAFT Launcher"],
+    ["DisplayVersion", app.getVersion()],
+    ["Publisher", "NOVACRAFT"],
+    ["DisplayIcon", exe],
+    ["InstallLocation", path.dirname(exe)],
+    ["UninstallString", `"${exe}" --uninstall`],
+    ["NoModify", "1", "REG_DWORD"],
+    ["NoRepair", "1", "REG_DWORD"],
   ];
-  return new Promise((resolve, reject) => {
-    execFile("reg.exe", base, (err) => {
-      onProgress({ phase: "install", percent: 95, detail: "INSTALL_REGISTER" });
-      if (err) reject(err);
-      else resolve();
+  const run = (v: string[]) =>
+    new Promise<void>((resolve, reject) => {
+      execFile("reg.exe", ["add", key, "/f", ...v], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
     });
-  });
+  return values
+    .reduce(
+      (chain, [name, data, type]) => chain.then(() => run(["/v", name, "/d", data, ...(type ? ["/t", type] : [])])),
+      Promise.resolve(),
+    )
+    .then(() => {
+      onProgress({ phase: "install", percent: 95, detail: "INSTALL_REGISTER" });
+    });
 }
 
 function launchAndQuit(exe: string): void {
