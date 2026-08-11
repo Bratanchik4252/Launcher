@@ -139,8 +139,10 @@ export async function loginWithSupabase(
     }
 
     const profile = await fetchProfile(data.session.user.id);
+    const fallbackNick =
+      (data.session.user.email || "").split("@")[0] || "player";
     const session: SessionData = {
-      nickname: profile?.name || data.session.user.email.split("@")[0],
+      nickname: profile?.name || fallbackNick,
       email: profile?.email || email,
       userId: data.session.user.id,
       accessToken: data.session.access_token,
@@ -213,21 +215,6 @@ export async function getServerAddress(): Promise<{ host: string; port: number }
     const port = Number(map["server_port"] || 25565);
     if (!host) return null;
     return { host, port: Number.isFinite(port) ? port : 25565 };
-  } catch {
-    return null;
-  }
-}
-
-/** SHA-256 модпака из БД (приоритет над конфигом). */
-export async function getModpackSha256(): Promise<string | null> {
-  try {
-    const { data, error } = await getClient()
-      .from("launcher_meta")
-      .select("value")
-      .eq("key", "modpack_sha256")
-      .maybeSingle();
-    if (error || !data) return null;
-    return String(data.value || "").trim() || null;
   } catch {
     return null;
   }

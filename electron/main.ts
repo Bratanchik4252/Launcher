@@ -14,12 +14,17 @@ import {
   saveSettings,
 } from "./store";
 import { checkForUpdates, applyUpdate } from "./updater";
-import type { LaunchProgress } from "./types";
+import { installApp, isInstalled, isInstallMode, installDir, installedExe, uninstallApp } from "./installer";
+import type { InstallStatus, LaunchProgress } from "./types";
 
 let mainWindow: BrowserWindow | null = null;
 
 function broadcastProgress(p: LaunchProgress): void {
   mainWindow?.webContents.send("launch:progress", p);
+}
+
+function broadcastInstallProgress(p: LaunchProgress): void {
+  mainWindow?.webContents.send("install:progress", p);
 }
 
 function createWindow(): void {
@@ -91,6 +96,18 @@ function registerIpc(): void {
   ipcMain.handle("update:check", () => checkForUpdates());
   ipcMain.handle("update:apply", () => applyUpdate());
   ipcMain.handle("launch:start", async () => prepareAndLaunch(broadcastProgress));
+  ipcMain.handle("install:status", (): InstallStatus => ({
+    installMode: isInstallMode(),
+    installed: isInstalled(),
+    installDir: installDir(),
+    exe: installedExe(),
+    version: app.getVersion(),
+  }));
+  ipcMain.handle("install:start", async () => installApp(broadcastInstallProgress));
+  ipcMain.handle("install:uninstall", async () => {
+    if (!isInstalled()) return;
+    await uninstallApp();
+  });
   ipcMain.handle("system:ramMb", () => Math.floor(os.totalmem() / 1024 / 1024));
   ipcMain.handle("game:getDir", () => getGameDir());
   ipcMain.handle("game:pickFolder", async () => {
@@ -103,11 +120,18 @@ function registerIpc(): void {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   app.setName("NOVACRAFT Launcher");
   fs.mkdirSync(defaultGameDir(), { recursive: true });
   ensureDirs();
   registerIpc();
+
+  // Режим деинсталляции: без окна — удаление и выход.
+  if (process.argv.includes("--uninstall") && isInstalled()) {
+    await uninstallApp();
+    return;
+  }
+
   createWindow();
 
   app.on("activate", () => {

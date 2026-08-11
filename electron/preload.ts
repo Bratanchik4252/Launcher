@@ -34,6 +34,14 @@ const api: LauncherAPI = {
   getSystemRamMb: () => ipcRenderer.invoke("system:ramMb"),
   pickGameFolder: () => ipcRenderer.invoke("game:pickFolder"),
   getGameDirPath: () => ipcRenderer.invoke("game:getDir"),
+  getInstallStatus: () => ipcRenderer.invoke("install:status"),
+  installApp: () => ipcRenderer.invoke("install:start"),
+  uninstallApp: () => ipcRenderer.invoke("install:uninstall"),
+  onInstallProgress: (cb) => {
+    const handler = (_: unknown, p: LaunchProgress) => cb(p);
+    ipcRenderer.on("install:progress", handler);
+    return () => ipcRenderer.removeListener("install:progress", handler);
+  },
 };
 
 contextBridge.exposeInMainWorld("launcher", api);

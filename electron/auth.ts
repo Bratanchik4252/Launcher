@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { loadConfig } from "./config";
 import type { AuthResult, HwidCheckResult, SessionData } from "./types";
-import { loadSavedAccounts, saveSavedAccounts, saveSession, loadSettings } from "./store";
+import { loadSavedAccounts, loadSession, saveSavedAccounts, saveSession, loadSettings } from "./store";
 import { loginWithSupabase, refreshSession, signOut, checkHardwareBan as checkHwid } from "./supabase";
 
 /**
@@ -72,5 +72,3 @@ export async function logout(): Promise<void> {
     saveSession(null);
   }
 }
-
-export { loadSession } from "./store";

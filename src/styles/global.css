@@ -1067,3 +1067,150 @@ input {
   color: var(--text-muted);
   line-height: 1.5;
 }
+
+
+/* ---------- Install screen (install-mode) ---------- */
+.install-screen {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.install-rings {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.install-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 60px var(--accent-glow), inset 0 0 40px var(--accent-glow);
+}
+
+.install-ring.r1 { width: 480px; height: 480px; }
+.install-ring.r2 { width: 560px; height: 560px; opacity: 0.5; }
+
+.install-card {
+  position: relative;
+  z-index: 2;
+  width: min(460px, 90vw);
+  padding: 36px 32px;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 0 60px var(--accent-glow);
+}
+
+.install-logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 44px var(--accent-glow);
+  margin-bottom: 18px;
+}
+
+.install-title { margin: 0 0 6px; font-size: 1.5rem; }
+.install-desc { margin: 0 0 14px; color: var(--text-muted); line-height: 1.5; }
+
+.install-path {
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--glass-inset);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 18px;
+}
+
+.install-steps {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.install-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  transition: color 0.3s;
+}
+
+.install-step.active { color: var(--text); }
+.install-step.done { color: var(--accent); }
+
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.install-step.active .step-dot {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.install-step.done .step-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.install-bar-wrap { width: 100%; margin-bottom: 14px; }
+
+.install-bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--glass-inset);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.install-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.install-bar-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+}
+
+.install-status { margin: 0; color: var(--accent); font-size: 0.85rem; min-height: 1.3em; }
+.install-error { margin: 0; color: #ff6b6b; font-size: 0.85rem; }
+
+.install-btn { max-width: 220px; }

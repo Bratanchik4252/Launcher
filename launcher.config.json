@@ -1,7 +1,7 @@
 {
   "brandName": "NOVACRAFT",
-  "supabaseUrl": "https://YOUR-PROJECT.supabase.co",
-  "supabaseAnonKey": "YOUR-ANON-KEY",
+  "supabaseUrl": "https://apcnsagskuheduzjbgyv.supabase.co",
+  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwY25zYWdza3VoZWR1empiZ3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3NzkwMjQsImV4cCI6MjEwMTM1NTAyNH0.ZIP9e05ScUi53m0-NviTG_8R91SjdCraKIUGv4SbLog",
   "gameVersion": "1.7.10",
   "forgeVersion": "10.13.4.1614-1.7.10",
   "links": {
@@ -13,13 +13,12 @@
     "supportDiscord": "https://discord.gg/mMhmkgExNM"
   },
   "modpack": {
-    "source": "github",
+    "source": "github-folder",
     "githubOwner": "Bratanchik4252",
     "githubRepo": "ModPack",
-    "githubAssetName": "modpack.zip",
-    "sha256": "",
-    "manifestUrl": "",
-    "fallbackDownloadUrl": ""
+    "githubBranch": "main",
+    "modsFolder": "mods",
+    "configFolder": "config"
   },
   "java": {
     "majorVersion": 8,

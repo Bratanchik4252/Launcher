@@ -1,7 +1,8 @@
 # ROADMAP лаунчера NOVACRAFT
 
 > Лаунчер Minecraft **1.7.10** (версия проекта сменилась с 1.12.2!). Electron + React + TypeScript.
-> Код лежит в `launcher/`. Этот файл — план и список TODO. Сайт-ROADMAP — в корне `ROADMAP.md`.
+> Код лежит в отдельном репозитории `C:\Users\danie\NovaCraft-Launcher` (GitHub: Bratanchik4252/Launcher).
+> Этот файл — план и список TODO. Сайт-ROADMAP — в корне `ROADMAP.md` сайта.
 
 **Жёсткие требования (от владельца):**
 - Без бэкдоров и дыр, нельзя заддосить, нельзя украсть токены.
@@ -15,22 +16,24 @@
 
 ## Фаза 1 — брендинг, авторизация, безопасность (сейчас)
 
-- [x] Скопирован код в `launcher/` (без node_modules/dist).
-- [ ] Удалить `api-auth/` и `mock-api/` (свой Node-сервер — лишняя цель; всё через Supabase).
-- [ ] Ребрендинг: `package.json` (name/productName/author, версия 0.1.0), `launcher.config.json` (brandName NOVACRAFT), убрать все «!!!!!».
-- [ ] Авторизация через **Supabase** (`supabase-js` в main-процессе):
+- [x] Код перенесён в отдельный репозиторий `NovaCraft-Launcher`.
+- [x] Удалены `api-auth/` и `mock-api/` (свой Node-сервер — лишняя цель; всё через Supabase).
+- [x] Ребрендинг: `package.json` (name/productName/author, версия 0.1.0), `launcher.config.json` (brandName NOVACRAFT), все «!!!!!» убраны.
+- [x] Авторизация через **Supabase** (`supabase-js` в main-процессе):
   - вход по нику ИЛИ email + пароль (ник → email через запрос в `profiles`);
   - сессия (JWT) хранится в `safeStorage`/DPAPI, восстановление при старте;
-  - **антибрутфорс**: 5 неудачных попыток → блок 5 минут (как на сайте, `mc:attempts`-аналог локально).
-- [ ] Удалить `devAuthBypass` и любой вход без пароля.
-- [ ] Убрать plaintext-фолбэк сессий (только DPAPI, иначе — не хранить токен вообще).
-- [ ] **IP сервера убрать из клиента**: `serverHost/serverPort` больше не в `launcher.config.json`; адрес приходит из таблицы `launcher_meta` (Supabase) при запуске.
-- [ ] Запуск игры: передавать игре `--server/--port/--username` (автоподключение к серверу), токен сессии — клиентскому моду (в файл/arg, права 0600).
-- [ ] SHA-256 проверка скачанного модпака и Java (хэш из `launcher_meta`/GitHub release asset).
-- [ ] Убрать PowerShell-инъекцию при распаковке (native unzip вместо Expand-Archive).
-- [ ] Рестайл UI в стиль сайта: тёмная тема, glass-карточки, зелёные акценты, логотип/фавиконка NOVACRAFT.
-- [ ] Схема Supabase лаунчера: `launcher_meta`, `hwid_bans` (без service_role: только Edge Function с JWT), белый список модов.
-- [ ] Удалить мёртвый код (`SettingsPanel`, `LoginPage`).
+  - **антибрутфорс**: 5 неудачных попыток → блок 5 минут (как на сайте, локальный файл `auth-attempts.json`).
+- [x] Удалён `devAuthBypass` и любой вход без пароля.
+- [x] Убран plaintext-фолбэк сессий (только DPAPI, иначе — не хранить токен вообще).
+- [x] **IP сервера убран из клиента**: `serverHost/serverPort` больше нет в `launcher.config.json`; адрес приходит из таблицы `launcher_meta` (Supabase) при запуске.
+- [x] Запуск игры: передача игре `--server/--port/--username` (автоподключение к серверу), токен сессии — клиентскому моду (файл `novacraft_session`, права 0600, env `NOVACRAFT_SESSION`).
+- [x] SHA-256 проверка Java (заголовок X-Checksum-SHA256 от Adoptium); модпак — git blob-sha из GitHub API.
+- [x] Убрана PowerShell-инъекция при распаковке (нативный `tar.exe`).
+- [x] Схема Supabase лаунчера добавлена в `supabase-schema.sql` сайта: `launcher_meta`, `hwid_bans` (без service_role, только RLS). **Нужно перезапустить скрипт.**
+- [x] Удалён мёртвый код (`SettingsPanel`, `LoginPage`).
+- [ ] Рестайл UI в стиль сайта: тёмная тема, glass-карточки, зелёные акценты, логотип/фавиконка NOVACRAFT, много анимаций.
+- [ ] **Кастомный установщик (install-mode)**: вместо NSIS с зелёной полосой — анимированный экран установки в стиле лаунчера, свои прогресс-бары (задача от владельца).
+- [ ] Модпак: автоподхват модов с GitHub — юзер просто заливает моды в репозиторий `Bratanchik4252/ModPack`, лаунчер сам скачивает и синкает.
 
 ## Фаза 2 — модпак и обновления (после Фазы 1)
 

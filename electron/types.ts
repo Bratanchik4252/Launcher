@@ -15,14 +15,19 @@ export type LauncherConfig = {
     supportDiscord: string;
   };
   modpack: {
-    source: "github" | "url";
+    /** github-folder: автоподхват модов из папок репозитория (mods/, config/). */
+    source: "github-folder" | "github" | "url";
     githubOwner: string;
     githubRepo: string;
-    githubAssetName: string;
-    /** SHA-256 модпака. Может перекрываться из таблицы launcher_meta. */
-    sha256: string;
-    manifestUrl: string;
-    fallbackDownloadUrl: string;
+    githubBranch: string;
+    /** Папка в репозитории, откуда берутся моды (*.jar в gameDir/mods). */
+    modsFolder: string;
+    /** Папка в репозитории с конфигами (опционально). */
+    configFolder: string;
+    githubAssetName?: string;
+    sha256?: string;
+    manifestUrl?: string;
+    fallbackDownloadUrl?: string;
   };
   java: {
     majorVersion: number;
@@ -79,10 +84,12 @@ export type LaunchProgress = {
 
 export type AccentId = "mono" | "royal" | "amber" | "mint" | "rose";
 
+export type LangId = "ru" | "en" | "de" | "fr" | "es" | "uk" | "pl";
+
 export type AppSettings = {
   ramMb: number;
   ramAuto: boolean;
-  language: "ru" | "en";
+  language: LangId;
   theme: "dark" | "light";
   accent: AccentId;
   rememberMe: boolean;
@@ -93,6 +100,14 @@ export type AppSettings = {
 export type ServerAddress = {
   host: string;
   port: number;
+};
+
+export type InstallStatus = {
+  installMode: boolean;
+  installed: boolean;
+  installDir: string;
+  exe: string;
+  version: string;
 };
 
 export type LauncherAPI = {
@@ -122,6 +137,10 @@ export type LauncherAPI = {
   getSystemRamMb: () => Promise<number>;
   pickGameFolder: () => Promise<string | null>;
   getGameDirPath: () => Promise<string>;
+  getInstallStatus: () => Promise<InstallStatus>;
+  installApp: () => Promise<void>;
+  uninstallApp: () => Promise<void>;
+  onInstallProgress: (cb: (p: LaunchProgress) => void) => () => void;
 };
 
 declare global {

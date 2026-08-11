@@ -44,14 +44,12 @@
     ],
     "win": {
       "target": [
-        "nsis"
+        "portable"
       ],
       "artifactName": "NovaCraftLauncher-${version}-setup.${ext}"
     },
-    "nsis": {
-      "oneClick": true,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": false
+    "portable": {
+      "artifactName": "NovaCraftLauncher-${version}-setup.${ext}"
     }
   }
 }

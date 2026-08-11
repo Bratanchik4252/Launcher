@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import type { AppSettings, LauncherConfig, LaunchProgress } from "../electron/types";
+import type { AppSettings, InstallStatus, LauncherConfig, LaunchProgress } from "../electron/types";
 import { AuthModal } from "./components/AuthModal";
 import { BanScreen } from "./components/BanScreen";
 import { BackgroundOrbs, TitleBar } from "./components/Chrome";
+import { InstallScreen } from "./components/InstallScreen";
 import { ProgressOverlay } from "./components/ProgressOverlay";
 import { TopNav, type Tab } from "./components/TopNav";
 import { UpdateModal } from "./components/UpdateModal";
@@ -29,6 +30,7 @@ export default function App() {
   const [selectedServer, setSelectedServer] = useState<string | null>("main");
   const [gameDir, setGameDir] = useState("");
   const [ban, setBan] = useState<{ reason?: string } | null>(null);
+  const [installStatus, setInstallStatus] = useState<InstallStatus | null>(null);
 
   const lang: Lang = settings?.language ?? "ru";
 
@@ -40,6 +42,9 @@ export default function App() {
 
   useEffect(() => {
     void (async () => {
+      const install = await window.launcher.getInstallStatus();
+      setInstallStatus(install);
+      if (install.installMode) return;
       const [cfg, st, dir] = await Promise.all([
         window.launcher.getConfig(),
         window.launcher.getSettings(),
@@ -120,6 +125,14 @@ export default function App() {
     setProgress(null);
     if (!res.ok && res.message) setLaunchError(res.message);
   };
+
+  if (installStatus?.installMode) {
+    return (
+      <div className="app-shell">
+        <InstallScreen status={installStatus} lang={lang} />
+      </div>
+    );
+  }
 
   if (!config || !settings) return null;
 
