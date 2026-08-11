@@ -16,7 +16,6 @@ import {
 import { checkForUpdates, applyUpdate } from "./updater";
 import { installApp, isInstalled, isInstallMode, installDir, installedExe, uninstallApp } from "./installer";
 import type { InstallStatus, LaunchProgress } from "./types";
-
 let mainWindow: BrowserWindow | null = null;
 
 function broadcastProgress(p: LaunchProgress): void {
@@ -103,7 +102,7 @@ function registerIpc(): void {
     exe: installedExe(),
     version: app.getVersion(),
   }));
-  ipcMain.handle("install:start", async () => installApp(broadcastInstallProgress));
+  ipcMain.handle("install:start", async (_e, opts) => installApp(broadcastInstallProgress, opts));
   ipcMain.handle("install:uninstall", async () => {
     if (!isInstalled()) return;
     await uninstallApp();

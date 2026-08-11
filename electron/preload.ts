@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { LauncherAPI, LaunchProgress } from "./types";
+import type { InstallOptions, LauncherAPI, LaunchProgress } from "./types";
 
 const api: LauncherAPI = {
   getConfig: () => ipcRenderer.invoke("config:get"),
@@ -35,7 +35,7 @@ const api: LauncherAPI = {
   pickGameFolder: () => ipcRenderer.invoke("game:pickFolder"),
   getGameDirPath: () => ipcRenderer.invoke("game:getDir"),
   getInstallStatus: () => ipcRenderer.invoke("install:status"),
-  installApp: () => ipcRenderer.invoke("install:start"),
+  installApp: (opts) => ipcRenderer.invoke("install:start", opts),
   uninstallApp: () => ipcRenderer.invoke("install:uninstall"),
   onInstallProgress: (cb) => {
     const handler = (_: unknown, p: LaunchProgress) => cb(p);

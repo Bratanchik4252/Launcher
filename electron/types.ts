@@ -110,6 +110,11 @@ export type InstallStatus = {
   version: string;
 };
 
+export type InstallOptions = {
+  launchAfter?: boolean;
+  autoStart?: boolean;
+};
+
 export type LauncherAPI = {
   getConfig: () => Promise<LauncherConfig>;
   getSettings: () => Promise<AppSettings>;
@@ -138,7 +143,7 @@ export type LauncherAPI = {
   pickGameFolder: () => Promise<string | null>;
   getGameDirPath: () => Promise<string>;
   getInstallStatus: () => Promise<InstallStatus>;
-  installApp: () => Promise<void>;
+  installApp: (opts?: InstallOptions) => Promise<void>;
   uninstallApp: () => Promise<void>;
   onInstallProgress: (cb: (p: LaunchProgress) => void) => () => void;
 };

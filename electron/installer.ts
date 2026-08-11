@@ -45,12 +45,12 @@ function runningFromTemp(): boolean {
   return process.execPath.toLowerCase().startsWith(os.tmpdir().toLowerCase());
 }
 
-/** Копирование установщика в папку установки (свой exe можно копировать). */
-function copySelf(destExe: string): void {
-  fs.mkdirSync(path.dirname(destExe), { recursive: true });
-  fs.copyFileSync(process.execPath, destExe);
+/** Копирование приложения целиком (exe + resources\app.asar + locales). */
+function copySelf(destDir: string): void {
+  fs.mkdirSync(destDir, { recursive: true });
+  fs.cpSync(path.dirname(process.execPath), destDir, { recursive: true });
   fs.writeFileSync(
-    path.join(path.dirname(destExe), "installed.json"),
+    path.join(destDir, "installed.json"),
     JSON.stringify({ version: app.getVersion(), installedAt: Date.now() }),
     "utf8",
   );
@@ -123,30 +123,57 @@ function registerUninstall(exe: string, onProgress: (p: LaunchProgress) => void)
     });
 }
 
+/** Автозапуск со стартом системы (HKCU Run). */
+function setAutoStart(exe: string, enabled: boolean): Promise<void> {
+  const key = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+  const args = enabled ? ["add", key, "/f", "/v", "NOVACRAFT Launcher", "/d", `"${exe}"`] : ["delete", key, "/v", "NOVACRAFT Launcher", "/f"];
+  return new Promise((resolve) => {
+    execFile("reg.exe", args, () => resolve());
+  });
+}
+
 function launchAndQuit(exe: string): void {
   const child = spawn(exe, [], { detached: true, stdio: "ignore" });
   child.unref();
   app.exit(0);
 }
 
-/** Полная установка: копирование → ярлыки → реестр → запуск. */
-export async function installApp(onProgress: (p: LaunchProgress) => void): Promise<void> {
+export interface InstallOptions {
+  launchAfter?: boolean;
+  autoStart?: boolean;
+}
+
+/** Полная установка: копирование → ярлыки → реестр → автозапуск → запуск. */
+export async function installApp(
+  onProgress: (p: LaunchProgress) => void,
+  opts: InstallOptions = {},
+): Promise<void> {
   if (!app.isPackaged) throw new Error("INSTALL_DEV_MODE");
   if (isInstalled()) throw new Error("INSTALL_ALREADY");
 
   const config = loadConfig();
+  const destDir = installDir();
   const destExe = installedExe();
 
-  onProgress({ phase: "install", percent: 5, detail: "INSTALL_COPY" });
-  copySelf(destExe);
+  onProgress({ phase: "install", percent: 4, detail: "INSTALL_COPY" });
+  copySelf(destDir);
 
-  onProgress({ phase: "install", percent: 60, detail: "INSTALL_SHORTCUTS" });
+  onProgress({ phase: "install", percent: 55, detail: "INSTALL_SHORTCUTS" });
   await createShortcuts(destExe, config.links.website, onProgress);
 
+  onProgress({ phase: "install", percent: 80, detail: "INSTALL_REGISTER" });
   await registerUninstall(destExe, onProgress);
 
+  if (opts.autoStart) {
+    await setAutoStart(destExe, true);
+  }
+
   onProgress({ phase: "install", percent: 100, detail: "INSTALL_DONE" });
-  launchAndQuit(destExe);
+  if (opts.launchAfter !== false) {
+    launchAndQuit(destExe);
+  } else {
+    app.exit(0);
+  }
 }
 
 /** Удаление: реестр, ярлыки, своя папка (отложенное удаление через bat). */
@@ -161,6 +188,8 @@ export async function uninstallApp(): Promise<void> {
       () => resolve(),
     );
   });
+
+  await setAutoStart(exe, false);
 
   const desktop = app.getPath("desktop");
   const startMenu = path.join(app.getPath("appData"), "Microsoft", "Windows", "Start Menu", "Programs");

@@ -15,10 +15,35 @@ const STEP_ORDER: Record<string, number> = {
   INSTALL_REGISTER: 2,
 };
 
+function Toggle({ checked, onChange, label, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
+  return (
+    <div className="toggle-row">
+      <span className="toggle-label">{label}</span>
+      <motion.button
+        type="button"
+        className={`toggle ${checked ? "on" : ""}`}
+        onClick={() => onChange(!checked)}
+        disabled={disabled}
+        whileTap={{ scale: 0.92 }}
+        aria-pressed={checked}
+      >
+        <motion.span
+          className="toggle-knob"
+          animate={{ x: checked ? 20 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      </motion.button>
+    </div>
+  );
+}
+
 export function InstallScreen({ status, lang }: { status: InstallStatus; lang: Lang }) {
   const [progress, setProgress] = useState<LaunchProgress | null>(null);
   const [error, setError] = useState<string>();
   const [running, setRunning] = useState(false);
+  const [launchAfter, setLaunchAfter] = useState(true);
+  const [autoStart, setAutoStart] = useState(false);
+  const [displayStep, setDisplayStep] = useState(-1);
   const doneRef = useRef(false);
 
   useEffect(() => {
@@ -33,11 +58,23 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
   const percent = progress?.percent ?? 0;
   const installing = running && !doneRef.current && !error;
 
+  useEffect(() => {
+    if (!installing) return;
+    const t = setInterval(() => {
+      setDisplayStep((d) => {
+        if (d >= STEPS.length - 1) return d;
+        const target = doneRef.current ? STEPS.length : currentStep;
+        return target > d ? d + 1 : d;
+      });
+    }, 750);
+    return () => clearInterval(t);
+  }, [installing, currentStep]);
+
   const start = async () => {
     setRunning(true);
     setError(undefined);
     try {
-      await window.launcher.installApp();
+      await window.launcher.installApp({ launchAfter, autoStart });
     } catch (e) {
       setError(e instanceof Error ? e.message : "INSTALL_FAILED");
       setRunning(false);
@@ -80,7 +117,7 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
 
         <div className="install-steps">
           {STEPS.map((s, i) => {
-            const state = currentStep > i ? "done" : currentStep === i ? "active" : "idle";
+            const state = displayStep > i ? "done" : displayStep === i ? "active" : "idle";
             return (
               <div key={s.key} className={`install-step ${state}`}>
                 <motion.div
@@ -94,6 +131,11 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
               </div>
             );
           })}
+        </div>
+
+        <div className="install-options">
+          <Toggle checked={launchAfter} onChange={setLaunchAfter} label={m(lang, "installLaunchAfter")} disabled={installing} />
+          <Toggle checked={autoStart} onChange={setAutoStart} label={m(lang, "installAutoStart")} disabled={installing} />
         </div>
 
         <div className="install-bar-wrap">
