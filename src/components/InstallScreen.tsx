@@ -9,11 +9,13 @@ const STEPS: { key: "INSTALL_COPY" | "INSTALL_SHORTCUTS" | "INSTALL_REGISTER"; l
   { key: "INSTALL_REGISTER", labelKey: "installRegister" },
 ];
 
-const STEP_ORDER: Record<string, number> = {
-  INSTALL_COPY: 0,
-  INSTALL_SHORTCUTS: 1,
-  INSTALL_REGISTER: 2,
-};
+const MILESTONES = [
+  { active: 4, done: 55 },
+  { active: 55, done: 80 },
+  { active: 80, done: 100 },
+];
+
+type StepState = "idle" | "active" | "done";
 
 function Toggle({ checked, onChange, label, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
   return (
@@ -43,7 +45,7 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
   const [running, setRunning] = useState(false);
   const [launchAfter, setLaunchAfter] = useState(true);
   const [autoStart, setAutoStart] = useState(false);
-  const [displayStep, setDisplayStep] = useState(-1);
+  const [stepState, setStepState] = useState<StepState[]>(["idle", "idle", "idle"]);
   const doneRef = useRef(false);
 
   useEffect(() => {
@@ -53,22 +55,34 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
     });
   }, []);
 
-  const currentStep =
-    progress && progress.detail && progress.detail in STEP_ORDER ? STEP_ORDER[progress.detail] : -1;
   const percent = progress?.percent ?? 0;
   const installing = running && !doneRef.current && !error;
 
   useEffect(() => {
-    if (!installing) return;
-    const t = setInterval(() => {
-      setDisplayStep((d) => {
-        if (d >= STEPS.length - 1) return d;
-        const target = doneRef.current ? STEPS.length : currentStep;
-        return target > d ? d + 1 : d;
+    if (!installing && !doneRef.current) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    STEPS.forEach((_, i) => {
+      const m = MILESTONES[i];
+      if (percent < m.active) return;
+      setStepState((s) => {
+        if (s[i] !== "idle") return s;
+        const next = [...s];
+        next[i] = "active";
+        return next;
       });
-    }, 750);
-    return () => clearInterval(t);
-  }, [installing, currentStep]);
+      timers.push(
+        setTimeout(() => {
+          setStepState((s) => {
+            if (s[i] === "done") return s;
+            const next = [...s];
+            next[i] = "done";
+            return next;
+          });
+        }, percent >= m.done ? 1000 : 1200),
+      );
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [percent, installing]);
 
   const start = async () => {
     setRunning(true);
@@ -117,7 +131,7 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
 
         <div className="install-steps">
           {STEPS.map((s, i) => {
-            const state = displayStep > i ? "done" : displayStep === i ? "active" : "idle";
+            const state = stepState[i];
             return (
               <div key={s.key} className={`install-step ${state}`}>
                 <motion.div
@@ -162,9 +176,7 @@ export function InstallScreen({ status, lang }: { status: InstallStatus; lang: L
             <motion.p key="run" className="install-status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {percent >= 100
                 ? m(lang, "installLaunching")
-                : progress?.detail && progress.detail in STEP_ORDER
-                  ? m(lang, STEPS[STEP_ORDER[progress.detail]].labelKey) + "..."
-                  : m(lang, "installCopying") + "..."}
+                : m(lang, STEPS[Math.max(0, stepState.findIndex((s) => s !== "done"))].labelKey) + "..."}
             </motion.p>
           ) : (
             <motion.div key="btn" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>

@@ -5,9 +5,10 @@
   "gameVersion": "1.7.10",
   "forgeVersion": "10.13.4.1614-1.7.10",
   "links": {
-    "website": "index.html",
-    "register": "auth.html",
-    "forgotPassword": "#",
+    "website": "https://novacraft/",
+    "register": "https://novacraft/auth.html",
+    "forgotPassword": "https://novacraft/auth.html",
+    "serversPage": "https://novacraft/servers.html",
     "discord": "https://discord.gg/mMhmkgExNM",
     "telegram": "https://t.me/NOVACRAFT2",
     "supportDiscord": "https://discord.gg/mMhmkgExNM"

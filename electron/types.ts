@@ -10,6 +10,7 @@ export type LauncherConfig = {
     website: string;
     register: string;
     forgotPassword: string;
+    serversPage: string;
     discord: string;
     telegram: string;
     supportDiscord: string;
@@ -115,6 +116,17 @@ export type InstallOptions = {
   autoStart?: boolean;
 };
 
+export type ServerInfo = {
+  id: number;
+  name: string;
+  description: string;
+  version: string;
+  online: number;
+  peakOnline: number;
+  maxOnline: number;
+  mods: string[];
+};
+
 export type LauncherAPI = {
   getConfig: () => Promise<LauncherConfig>;
   getSettings: () => Promise<AppSettings>;
@@ -131,6 +143,7 @@ export type LauncherAPI = {
   getHwid: () => Promise<string>;
   checkHardwareBan: () => Promise<HwidCheckResult>;
   getServerAddress: () => Promise<ServerAddress>;
+  getServers: () => Promise<ServerInfo[]>;
   windowMinimize: () => void;
   windowClose: () => void;
   startDrag: () => void;

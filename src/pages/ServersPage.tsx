@@ -1,103 +1,163 @@
-import { motion } from "framer-motion";
-import { SERVERS, type GameServer } from "../data/servers";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import type { ServerInfo } from "../../electron/types";
 import { m, type Lang } from "../i18n";
 
 type Props = {
   lang: Lang;
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-  onPlay: () => void;
+  servers: ServerInfo[];
+  onPlay: (server: ServerInfo) => void;
+  onViewOnSite: (server: ServerInfo) => void;
 };
 
-function ServerCard({
-  server,
-  active,
-  onClick,
-  index,
-}: {
-  server: GameServer;
-  active: boolean;
-  onClick: () => void;
-  index: number;
-}) {
+export function ServersPage({ lang, servers, onPlay, onViewOnSite }: Props) {
+  const [selected, setSelected] = useState<ServerInfo | null>(null);
+
+  if (selected) {
+    return (
+      <ServerDetail
+        lang={lang}
+        server={selected}
+        onBack={() => setSelected(null)}
+        onPlay={() => onPlay(selected)}
+        onViewOnSite={() => onViewOnSite(selected)}
+      />
+    );
+  }
+
   return (
-    <motion.button
-      type="button"
-      className={`server-card glass ${active ? "active" : ""}`}
-      onClick={onClick}
-      initial={{ opacity: 0, y: 14 }}
+    <motion.div
+      className="page page-servers"
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06 }}
-      whileHover={{ y: -4 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.35 }}
     >
-      <span className="server-tag">{server.tag}</span>
-      <h3>{server.name}</h3>
-      <div className="server-online">
-        <span className="dot" />
-        {server.online ?? "—"}
+      <div className="page-hero">
+        <h1 className="text-glow">{m(lang, "serversTitle")}</h1>
+        <p className="text-muted">{m(lang, "serversSubtitle")}</p>
       </div>
-    </motion.button>
+
+      {servers.length === 0 ? (
+        <div className="glass card empty-servers">{m(lang, "emptyServers")}</div>
+      ) : (
+        <div className="server-list">
+          {servers.map((s, i) => (
+            <motion.article
+              key={s.id}
+              className="server-row glass"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <button type="button" className="server-row-main" onClick={() => setSelected(s)}>
+                <div className="server-row-head">
+                  <strong className="server-name">{s.name}</strong>
+                  <span className={`badge ${s.online > 0 ? "online" : "offline"}`}>
+                    <span className="dot" />
+                    {s.online}
+                  </span>
+                </div>
+                <span className="server-version">{m(lang, "serverVersion")}: {s.version}</span>
+              </button>
+              <div className="server-row-actions">
+                <button type="button" className="btn btn-sm" onClick={() => setSelected(s)}>
+                  {m(lang, "more")}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm play-server-btn"
+                  onClick={() => onPlay(s)}
+                >
+                  {m(lang, "playServer")}
+                </button>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      )}
+    </motion.div>
   );
 }
 
-export function ServersPage({ lang, selectedId, onSelect, onPlay }: Props) {
-  const selected = SERVERS.find((s) => s.id === selectedId) ?? null;
-
+function ServerDetail({
+  lang,
+  server: s,
+  onBack,
+  onPlay,
+  onViewOnSite,
+}: {
+  lang: Lang;
+  server: ServerInfo;
+  onBack: () => void;
+  onPlay: () => void;
+  onViewOnSite: () => void;
+}) {
   return (
-    <motion.div className="page servers-layout" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <header className="servers-head">
-        <h2>{m(lang, "serversTitle")}</h2>
-        <p>{m(lang, "serversSubtitle")}</p>
-      </header>
-      <div className="servers-split">
-        <div className="server-grid compact">
-          {SERVERS.map((s, i) => (
-            <ServerCard
-              key={s.id}
-              server={s}
-              active={s.id === selectedId}
-              onClick={() => onSelect(s.id)}
-              index={i}
-            />
-          ))}
+    <motion.div
+      className="page page-server-detail"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.35 }}
+    >
+      <button type="button" className="btn btn-sm back-btn" onClick={onBack}>
+        ← {m(lang, "back")}
+      </button>
+
+      <motion.article
+        className="glass card server-detail"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="server-detail-head">
+          <h1 className="text-glow">{s.name}</h1>
+          <span className={`badge ${s.online > 0 ? "online" : "offline"}`}>
+            <span className="dot" />
+            {m(lang, "serverOnline")}: {s.online}
+          </span>
         </div>
-        <div className="server-detail glass">
-          {selected ? (
-            <>
-              <h3>{selected.name}</h3>
-              <div className="detail-meta">
-                <span>{selected.version}</span>
-                <span>{selected.mode}</span>
-              </div>
-              <p className="detail-desc">{selected.description}</p>
-              <div className="mod-tags">
-                {selected.modsHint.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <h3>{m(lang, "serverNotSelected")}</h3>
-              <p className="detail-desc">{m(lang, "serverPickHint")}</p>
-            </>
-          )}
+
+        <p className="server-detail-desc">{s.description}</p>
+
+        <div className="server-meta">
+          <span>{m(lang, "serverVersion")}: <strong>{s.version}</strong></span>
+          <span>{m(lang, "peakOnline")}: <strong>{s.peakOnline}</strong></span>
         </div>
-      </div>
-      <footer className="play-dock glass">
-        <div className="choice-label">
-          {m(lang, "yourChoice")}: <strong>{selected?.name ?? "—"}</strong>
+
+        {s.mods.length > 0 && (
+          <div className="mods-block">
+            <div className="mods-title">
+              {m(lang, "modsList")} ({s.mods.length})
+            </div>
+            <div className="mods-grid">
+              {s.mods.map((mod, i) => (
+                <span key={i} className="mod-chip">
+                  {mod}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="server-detail-actions">
+          <button type="button" className="btn" onClick={onViewOnSite}>
+            {m(lang, "viewOnSite")}
+          </button>
+          <motion.button
+            type="button"
+            className="btn play-server-btn"
+            onClick={onPlay}
+            whileHover={{ scale: 1.04, boxShadow: "var(--shadow)" }}
+            whileTap={{ scale: 0.97 }}
+          >
+            {m(lang, "playServer")}
+          </motion.button>
         </div>
-        <motion.button
-          type="button"
-          className="primary-btn play-btn"
-          disabled={!selected}
-          onClick={onPlay}
-          whileHover={selected ? { scale: 1.03 } : {}}
-        >
-          {m(lang, "playServer").toUpperCase()}
-        </motion.button>
-      </footer>
+      </motion.article>
+
+      <AnimatePresence />
     </motion.div>
   );
 }

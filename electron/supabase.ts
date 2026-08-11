@@ -5,7 +5,7 @@ import crypto from "node:crypto";
 import { app } from "electron";
 import { loadConfig } from "./config";
 import { getHardwareId } from "./hwid";
-import type { SessionData } from "./types";
+import type { ServerInfo, SessionData } from "./types";
 
 let client: SupabaseClient | null = null;
 
@@ -198,6 +198,29 @@ export async function checkHardwareBan(): Promise<{ banned: boolean; reason?: st
     return { banned: false };
   } catch {
     return { banned: false };
+  }
+}
+
+/** Список серверов проекта из БД (таблица servers, как на сайте). */
+export async function getServers(): Promise<ServerInfo[]> {
+  try {
+    const { data, error } = await getClient()
+      .from("servers")
+      .select("id,name,description,version,online,peak_online,max_online,mods,sort")
+      .order("sort");
+    if (error || !data) return [];
+    return data.map((s) => ({
+      id: Number(s.id),
+      name: String(s.name || ""),
+      description: String(s.description || ""),
+      version: String(s.version || ""),
+      online: Number(s.online) || 0,
+      peakOnline: Number(s.peak_online) || 0,
+      maxOnline: Number(s.max_online) || 0,
+      mods: Array.isArray(s.mods) ? s.mods.map(String) : [],
+    }));
+  } catch {
+    return [];
   }
 }
 

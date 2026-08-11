@@ -12,6 +12,7 @@ const api: LauncherAPI = {
   logout: () => ipcRenderer.invoke("auth:logout"),
   getSession: () => ipcRenderer.invoke("auth:session"),
   getServerAddress: () => ipcRenderer.invoke("meta:getServerAddress"),
+  getServers: () => ipcRenderer.invoke("meta:getServers"),
   openExternal: (url) => ipcRenderer.invoke("shell:open", url),
   openGameFolder: () => ipcRenderer.invoke("game:openFolder"),
   openLogsFolder: () => ipcRenderer.invoke("logs:openFolder"),

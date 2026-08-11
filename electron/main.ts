@@ -6,7 +6,7 @@ import { login, logout, checkHardwareBan, getValidSession } from "./auth";
 import { defaultGameDir, ensureDirs, getGameDir, loadConfig } from "./config";
 import { getHardwareId } from "./hwid";
 import { prepareAndLaunch } from "./launch";
-import { getServerAddress } from "./supabase";
+import { getServerAddress, getServers } from "./supabase";
 import {
   loadSavedAccounts,
   loadSettings,
@@ -89,6 +89,7 @@ function registerIpc(): void {
   ipcMain.handle("hwid:get", () => getHardwareId());
   ipcMain.handle("hwid:check", () => checkHardwareBan());
   ipcMain.handle("meta:getServerAddress", () => getServerAddress());
+  ipcMain.handle("meta:getServers", () => getServers());
   ipcMain.handle("window:minimize", () => mainWindow?.minimize());
   ipcMain.handle("window:close", () => mainWindow?.close());
   ipcMain.handle("dev:isDev", () => !app.isPackaged);

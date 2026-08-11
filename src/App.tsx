@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import type { AppSettings, InstallStatus, LauncherConfig, LaunchProgress } from "../electron/types";
-import { AuthModal } from "./components/AuthModal";
+import type { AppSettings, InstallStatus, LauncherConfig, LaunchProgress, ServerInfo } from "../electron/types";
 import { BanScreen } from "./components/BanScreen";
-import { BackgroundOrbs, TitleBar } from "./components/Chrome";
 import { InstallScreen } from "./components/InstallScreen";
+import { LoginScreen } from "./components/LoginScreen";
 import { ProgressOverlay } from "./components/ProgressOverlay";
-import { TopNav, type Tab } from "./components/TopNav";
+import { SiteHeader } from "./components/SiteHeader";
 import { UpdateModal } from "./components/UpdateModal";
 import { UserMenu } from "./components/UserMenu";
+import type { Tab } from "./components/TopNav";
 import { HomePage } from "./pages/HomePage";
 import { ServersPage } from "./pages/ServersPage";
 import { SettingsPage } from "./pages/SettingsPage";
-import { m, t, type Lang } from "./i18n";
+import { m, type Lang } from "./i18n";
 
 export default function App() {
   const [config, setConfig] = useState<LauncherConfig | null>(null);
@@ -20,14 +20,12 @@ export default function App() {
   const [session, setSession] = useState<{ nickname: string } | null>(null);
   const [tab, setTab] = useState<Tab>("home");
   const [authError, setAuthError] = useState<string>();
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authGate, setAuthGate] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [progress, setProgress] = useState<LaunchProgress | null>(null);
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const [isDev, setIsDev] = useState(false);
   const [launchError, setLaunchError] = useState<string>();
-  const [selectedServer, setSelectedServer] = useState<string | null>("main");
+  const [servers, setServers] = useState<ServerInfo[]>([]);
   const [gameDir, setGameDir] = useState("");
   const [ban, setBan] = useState<{ reason?: string } | null>(null);
   const [installStatus, setInstallStatus] = useState<InstallStatus | null>(null);
@@ -45,6 +43,7 @@ export default function App() {
       const install = await window.launcher.getInstallStatus();
       setInstallStatus(install);
       if (install.installMode) return;
+
       const [cfg, st, dir] = await Promise.all([
         window.launcher.getConfig(),
         window.launcher.getSettings(),
@@ -54,20 +53,26 @@ export default function App() {
       setSettings(st);
       setGameDir(dir);
 
-      const banCheck = await window.launcher.checkHardwareBan();
-      if (banCheck.banned) {
-        setBan({ reason: banCheck.reason });
-        return;
-      }
-
       const [sess, dev] = await Promise.all([
         window.launcher.getSession(),
         window.launcher.isDevMode(),
       ]);
       setSession(sess ? { nickname: sess.nickname } : null);
       setIsDev(dev);
-      const upd = await window.launcher.checkForUpdates();
-      if (upd.available && upd.version) setUpdateVersion(upd.version);
+
+      if (sess) {
+        const banCheck = await window.launcher.checkHardwareBan();
+        if (banCheck.banned) {
+          setBan({ reason: banCheck.reason });
+          return;
+        }
+        const [srv, upd] = await Promise.all([
+          window.launcher.getServers(),
+          window.launcher.checkForUpdates(),
+        ]);
+        setServers(srv);
+        if (upd.available && upd.version) setUpdateVersion(upd.version);
+      }
     })();
 
     return window.launcher.onLaunchProgress((p) => {
@@ -97,25 +102,28 @@ export default function App() {
     if (!res.ok) {
       if (res.banned) {
         setBan({ reason: res.reason });
-        setAuthOpen(false);
-        setAuthGate(false);
         return;
       }
       setAuthError(res.message);
       return;
     }
     setSession({ nickname: res.session.nickname });
-    setAuthOpen(false);
-    setAuthGate(false);
+    setTab("home");
+    const [banCheck, srv, upd] = await Promise.all([
+      window.launcher.checkHardwareBan(),
+      window.launcher.getServers(),
+      window.launcher.checkForUpdates(),
+    ]);
+    if (banCheck.banned) setBan({ reason: banCheck.reason });
+    setServers(srv);
+    if (upd.available && upd.version) setUpdateVersion(upd.version);
   };
 
-  const requestPlay = () => {
-    if (!session) {
-      setAuthGate(true);
-      setAuthOpen(true);
-      return;
-    }
-    void runLaunch();
+  const handleLogout = async () => {
+    await window.launcher.logout();
+    setSession(null);
+    setProfileOpen(false);
+    setServers([]);
   };
 
   const runLaunch = async () => {
@@ -139,60 +147,65 @@ export default function App() {
   if (ban) {
     return (
       <div className="app-shell">
-        <header className="titlebar glass">
-          <div className="titlebar-left">
-            <div className="brand">{config.brandName}</div>
-          </div>
-          <div className="win-controls">
-            <button type="button" className="win-btn" onClick={() => window.launcher.windowMinimize()}>
-              ─
-            </button>
-            <button type="button" className="win-btn close" onClick={() => window.launcher.windowClose()}>
-              ✕
-            </button>
+        <header className="site-header">
+          <div className="site-header-inner">
+            <div className="logo">
+              <span className="logo-cube" aria-hidden />
+              <span>{config.brandName}</span>
+            </div>
+            <div className="win-controls">
+              <button type="button" className="win-btn" onClick={() => window.launcher.windowMinimize()}>
+                ─
+              </button>
+              <button type="button" className="win-btn close" onClick={() => window.launcher.windowClose()}>
+                ✕
+              </button>
+            </div>
           </div>
         </header>
-        <BackgroundOrbs />
         <BanScreen lang={lang} onSupport={() => openLink("supportDiscord")} />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="app-shell">
+        <LoginScreen
+          lang={lang}
+          brand={config.brandName}
+          error={authError}
+          onSubmit={handleLogin}
+          onRegister={() => openLink("register")}
+          onForgot={() => openLink("forgotPassword")}
+        />
+        <ProgressOverlay lang={lang} progress={progress} />
       </div>
     );
   }
 
   return (
     <div className="app-shell">
-      <TitleBar
+      <SiteHeader
+        lang={lang}
         brand={config.brandName}
-        auth={{
-          loggedIn: !!session,
-          nickname: session?.nickname,
-          onLogin: () => {
-            setAuthGate(false);
-            setAuthOpen(true);
-          },
-          onRegister: () => openLink("register"),
-          onProfile: () => setProfileOpen((v) => !v),
-          onLogout: async () => {
-            await window.launcher.logout();
-            setSession(null);
-            setProfileOpen(false);
-            if (tab === "settings") setTab("home");
-          },
-          loginLabel: t(lang, "login"),
-          registerLabel: t(lang, "register"),
-        }}
+        tab={tab}
+        onTab={setTab}
+        nickname={session.nickname}
+        isWhiteTheme={settings.theme === "light"}
+        onToggleTheme={() =>
+          void saveSettings({ theme: settings.theme === "light" ? "dark" : "light" })
+        }
+        onProfile={() => setProfileOpen((v) => !v)}
       />
-      <BackgroundOrbs />
-      <TopNav lang={lang} tab={tab} onTab={setTab} loggedIn={!!session} />
       <main className="app-body">
         <AnimatePresence mode="wait">
           {tab === "home" && (
             <HomePage
               key="home"
               lang={lang}
-              loggedIn={!!session}
-              onlineLabel="—"
-              onPlay={requestPlay}
-              onReadUpdate={() => openLink("website")}
+              onPlay={runLaunch}
+              onSite={() => openLink("website")}
               onSupport={() => openLink("supportDiscord")}
             />
           )}
@@ -200,12 +213,12 @@ export default function App() {
             <ServersPage
               key="servers"
               lang={lang}
-              selectedId={selectedServer}
-              onSelect={setSelectedServer}
-              onPlay={requestPlay}
+              servers={servers}
+              onPlay={() => runLaunch()}
+              onViewOnSite={() => openLink("serversPage")}
             />
           )}
-          {tab === "settings" && session && (
+          {tab === "settings" && (
             <SettingsPage
               key="settings"
               lang={lang}
@@ -224,31 +237,16 @@ export default function App() {
       </main>
       <UserMenu
         lang={lang}
-        open={profileOpen && !!session}
-        nickname={session?.nickname ?? ""}
+        open={profileOpen}
+        nickname={session.nickname}
         coins={null}
         onClose={() => setProfileOpen(false)}
         onSettings={() => {
           setProfileOpen(false);
           setTab("settings");
         }}
-        onLogout={async () => {
-          await window.launcher.logout();
-          setSession(null);
-          setProfileOpen(false);
-        }}
+        onLogout={() => void handleLogout()}
         onWebsite={() => openLink("website")}
-      />
-      <AuthModal
-        lang={lang}
-        open={authOpen}
-        title={authGate ? m(lang, "authGateTitle") : undefined}
-        hint={authGate ? m(lang, "authGateHint") : undefined}
-        onClose={() => setAuthOpen(false)}
-        onSubmit={handleLogin}
-        onRegister={() => openLink("register")}
-        onForgot={() => openLink("forgotPassword")}
-        error={authError}
       />
       <ProgressOverlay lang={lang} progress={progress} />
       {updateVersion && (
